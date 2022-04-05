@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pantry.Models;
+using Pantry.Services;
 
 namespace Pantry.Controllers
 {
@@ -13,61 +14,19 @@ namespace Pantry.Controllers
     [ApiController]
     public class PackagesController : ControllerBase
     {
-        private readonly AppDataContext _context;
+        private readonly IPackageService _ps;
 
-        public PackagesController(AppDataContext context)
+        public PackagesController(IPackageService ps)
         {
-            _context = context;
-        }
-
-        // GET: api/Packages 
-        //get integrity status of a package specified by ? url query
-        [HttpGet]
-        public async Task<ActionResult<Package>> GetPackageInteg(string id)
-        {
-            try
-            {
-                int Id = int.Parse(id);
-                var package = await _context.Packages.FindAsync(Id);
-                if (package == null)
-                {
-                    return NotFound();
-                }
-
-                var a = new 
-                {
-                    PackageID = Id,
-                    PackageInteg = package.PackageInteg
-                };
-
-                return new ObjectResult(a); // return anonymous JSON object
-                
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.ToString());
-            }
+            _ps = ps;
         }
 
         // GET: api/Packages/n
         //get package specified by an id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Package>> GetPackage(String id)
+        public async Task<ActionResult<Package>> GetPackage(string id)
         {
-            try
-            {
-                int Id = int.Parse(id);
-                var package = await _context.Packages.FindAsync(Id);
-                if (package == null)
-                {
-                    return NotFound();
-                }
-                return package;
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.ToString());
-            }
+            return await _ps.GetPackage(id, this);
         }
 
         // POST: api/Package
@@ -75,16 +34,7 @@ namespace Pantry.Controllers
         [HttpPost]
         public async Task<ActionResult<Package>> PostPackage(Package package)
         {
-            try
-            {
-              _context.Packages.Add(package);
-              await _context.SaveChangesAsync();
-              return CreatedAtAction("GetPackage", new { id = package.PackageID }, package);
-            }
-            catch(Exception e)
-            {
-                return StatusCode(500, e.ToString());
-            }
+            return await _ps.PostPackage(package, this);
 
         }
     }

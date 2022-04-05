@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pantry.Models;
+using Pantry.Services;
 
 namespace Pantry.Controllers
 {
@@ -13,31 +14,20 @@ namespace Pantry.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDataContext _context;
 
-        public ProductsController(AppDataContext context)
+        private readonly IProductService _ps;
+
+        public ProductsController(IProductService ps)
         {
-            _context = context;
+            _ps = ps;
         }
-
-        // GET: api/Products 
+                  
+        // GET: api/Products/n
         // get a particular product from a particular package
-        // query ?
-        [HttpGet("{ProductID}")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string ProductID)
         {
-            try
-            {
-                
-                int proID = int.Parse(ProductID);
-                IQueryable<Product> query = _context.Products.AsQueryable();
-                query = query.Where<Product>(x => x.ProductID == proID);
-                return await query.ToListAsync();
-            }
-            catch(Exception e)
-            {
-                return StatusCode(500, e.ToString());
-            }
+            return await _ps.GetProducts(ProductID, this);
         }
 
         // GET: api/Products 
@@ -46,31 +36,8 @@ namespace Pantry.Controllers
         [HttpGet("{PantryID}")]
         public async Task<ActionResult<IEnumerable<Product>>> GetProductsInPantry(string PantryID)
         {
-            try
-            {
-                int paID = int.Parse(PantryID);
-                IQueryable<Product> query1 = _context.Products.AsQueryable();
-                IQueryable<Package> query2 = _context.Packages.AsQueryable();
-                query2 = query2.Where<Package>(x => x.PantryID == paID);
-                var join = (from q1 in query1 join q2 in query2
-                            on q1.PackageID equals q2.PackageID
-                            where q2.PantryID == paID
-                            select new Product
-                            {
-                                ProductID = q1.ProductID,
-                                ProductDesc = q1.ProductDesc,
-                                PackageID = q1.PackageID
-                            });
-
-                return await join.ToListAsync();
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.ToString());
-            }
-        }
-
-        
+            return await _ps.GetProductsInPantry(PantryID, this);
+        }    
 
     }
 }
