@@ -8,21 +8,12 @@ namespace Pantry.Models
 {
     public partial class AppDataContext : DbContext
     {
-        
-        public AppDataContext(DbContextOptions<AppDataContext> options) : base(options)
-        {
-        }
 
         public virtual DbSet<Pantry> Pantries { get; set; }
 
         public virtual DbSet<Package> Packages { get; set; }
 
         public virtual DbSet<Product> Products { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-           
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
