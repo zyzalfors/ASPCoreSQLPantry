@@ -14,6 +14,10 @@ namespace Pantry.Models
         public virtual DbSet<Package> Packages { get; set; }
 
         public virtual DbSet<Product> Products { get; set; }
+        
+         public AppDataContext(DbContextOptions<AppDataContext> options) : base(options)
+        {
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
