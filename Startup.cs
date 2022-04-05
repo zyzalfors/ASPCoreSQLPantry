@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Pantry.Models;
+using Pantry.Services;
 
 namespace Pantry
 {
@@ -49,7 +50,8 @@ namespace Pantry
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Pantry", Version = "v1" });
             });
 
-            //services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IPackageService, PackageService>(); //DI
+            services.AddScoped<IProductService, ProductService>(); //DI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
